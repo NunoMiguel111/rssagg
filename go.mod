@@ -1,6 +1,6 @@
 module github.com/NunoMiguel111/rssagg
 
-go 1.13
+go 1.20
 
 require (
 	github.com/go-chi/chi v4.1.2+incompatible
