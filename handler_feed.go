@@ -13,7 +13,7 @@ import (
 func (cfg *apiConfig) handlerCreateFeed(w http.ResponseWriter, r *http.Request, user database.User) {
 	type parameters struct {
 		Name string `json:"name"`
-		URL string`json:"url"`
+		URL  string `json:"url"`
 	}
 	decoder := json.NewDecoder(r.Body)
 	params := parameters{}
@@ -23,16 +23,30 @@ func (cfg *apiConfig) handlerCreateFeed(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 
-	user, err := cfg.DB.CreateFeed(r.Context(), database.CreateUserParams, ){
+	feed, err := cfg.DB.CreateFeed(r.Context(), database.CreateFeedParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
 		Name:      params.Name,
+		Url:       params.URL,
+		UserID:    user.ID,
 	})
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Couldn't create user")
+		respondWithError(w, http.StatusInternalServerError, "Couldn't create feed")
 		return
 	}
 
-	respondWithJSON(w, http.StatusCreated, databaseUserToUser(user))
+	respondWithJSON(w, http.StatusCreated, feed)
+}
+
+func (cfg *apiConfig) handlerGetFeeds(w http.ResponseWriter, r *http.Request) {
+
+	feeds, err := cfg.DB.GetFeeds(r.Context())
+
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Couldn't get all feeds")
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, feeds)
 }
